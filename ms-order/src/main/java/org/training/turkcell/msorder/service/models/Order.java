@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class Order {
+    private String orderId;
     private String name;
     private String surname;
     private String phoneNumber;

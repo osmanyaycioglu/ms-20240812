@@ -16,8 +16,6 @@ public class OrderDto {
     @NotBlank
     private String meal;
     @Positive
-    @Min(1)
-    @Max(10)
     private Integer amount;
 
 }
