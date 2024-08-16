@@ -3,7 +3,10 @@ package org.training.turkcell.msorder.integration.payment;
 import com.netflix.appinfo.InstanceInfo;
 import com.netflix.discovery.EurekaClient;
 import com.netflix.discovery.shared.Application;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestTemplate;
@@ -17,8 +20,8 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class PaymentIntegration {
-    private final RestTemplate restTemplate;
-    private final EurekaClient eurekaClient;
+    private final RestTemplate    restTemplate;
+    private final EurekaClient    eurekaClient;
     private final PaymentFeignInt paymentFeignInt;
 
     public PaymentResponse pay(Order orderParam) {
@@ -53,12 +56,19 @@ public class PaymentIntegration {
                                              PaymentResponse.class);
     }
 
+    @Retry(name = "payment-retry", fallbackMethod = "pay3Fallback")
+    @CircuitBreaker(name = "payment-cb", fallbackMethod = "pay3Fallback")
     public PaymentResponse pay3(Order orderParam) {
         PaymentRequest paymentRequestLoc = new PaymentRequest();
         paymentRequestLoc.setAmount(new BigDecimal(orderParam.getAmount()));
         paymentRequestLoc.setCustomerId(orderParam.getCustomerId());
         paymentRequestLoc.setOrderId(orderParam.getOrderId());
         return paymentFeignInt.pay(paymentRequestLoc);
+    }
+
+    public PaymentResponse pay3Fallback(Order orderParam,
+                                        Throwable throwableParam) {
+        throw new IllegalStateException("test");
     }
 
 }

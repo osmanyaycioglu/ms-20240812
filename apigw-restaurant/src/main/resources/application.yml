@@ -1,0 +1,14 @@
+spring:
+    application:
+        name: apigw-restaurant
+    config:
+        import: configserver:http://127.0.0.1:8888
+    cloud:
+        gateway:
+            routes:
+                - id: order-route
+                  uri: lb://order
+                  predicates:
+                    - Path=/api/v1/order/**
+server:
+    port: ${ABC:8080}
