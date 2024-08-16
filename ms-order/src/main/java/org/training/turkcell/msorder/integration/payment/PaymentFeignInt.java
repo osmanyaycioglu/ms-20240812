@@ -10,6 +10,6 @@ import org.training.turkcell.msorder.integration.payment.models.PaymentResponse;
 public interface PaymentFeignInt {
 
     @PostMapping("/api/v1/payment/process/pay")
-    public PaymentResponse pay(@RequestBody PaymentRequest paymentRequestParam);
+    PaymentResponse pay(@RequestBody PaymentRequest paymentRequestParam);
 
 }
